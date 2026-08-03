@@ -1,0 +1,23 @@
+{
+  "contract": "sample_gas_supply_agreement.txt",
+  "expected_clauses": [
+    {"title": "Definitions", "number": "1", "kind": "definitions"},
+    {"title": "Term", "number": "2", "kind": "other"},
+    {"title": "Pricing and Payment", "number": "3", "kind": "pricing"},
+    {"title": "Delivery", "number": "4", "kind": "delivery"},
+    {"title": "Take or Pay", "number": "5", "kind": "take-or-pay"},
+    {"title": "Force Majeure", "number": "7", "kind": "force-majeure"},
+    {"title": "Termination", "number": "8", "kind": "termination"},
+    {"title": "Limitation of Liability", "number": "9", "kind": "liability"},
+    {"title": "Confidentiality", "number": "10", "kind": "confidentiality"},
+    {"title": "Dispute Resolution", "number": "11", "kind": "dispute-resolution"},
+    {"title": "Governing Law", "number": "12", "kind": "other"}
+  ],
+  "expected_high_risk": ["Take or Pay"],
+  "required_kinds": [
+    "definitions", "pricing", "payment", "delivery", "force-majeure",
+    "termination", "liability", "confidentiality"
+  ],
+  "expected_missing": ["Insurance", "Audit Rights", "Cyber Security", "Anti-Bribery", "Credit Support"],
+  "expected_present": ["Force Majeure", "Liability Cap", "Change in Law"]
+}

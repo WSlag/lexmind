@@ -1,0 +1,37 @@
+# fly.toml generated for LexMind AI contract review
+app = "lexmind-ai-review"
+
+[build]
+  dockerfile = "backend/Dockerfile"
+
+[env]
+  APP_NAME = "LexMind AI"
+  DATA_DIR = "/data/reviews"
+  LLM_PROVIDER = "deepseek"
+
+# Sydney — closest Fly region for an Australian client.
+primary_region = "syd"
+
+[experimental]
+  auto_rollback = true
+
+[[mounts]]
+  source = "review_data"
+  destination = "/data"
+
+[[services]]
+  http_checks = []
+  internal_port = 8000
+  processes = ["app"]
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tls]]
+    # Certificate obtained automatically from Let's Encrypt.
+    stop_instances = true

@@ -1,0 +1,20 @@
+{
+  "contract": "framework_supply_agreement.txt",
+  "expected_clauses": [
+    {"title": "Supply", "number": "2", "kind": "delivery"},
+    {"title": "Pricing", "number": "3", "kind": "pricing"},
+    {"title": "Invoicing and Payment", "number": "4", "kind": "payment"},
+    {"title": "Quality", "number": "5", "kind": "other"},
+    {"title": "Force Majeure", "number": "6", "kind": "force-majeure"},
+    {"title": "Term and Termination", "number": "7", "kind": "termination"},
+    {"title": "Liability", "number": "8", "kind": "liability"},
+    {"title": "Confidentiality", "number": "9", "kind": "confidentiality"},
+    {"title": "Governing Law and Disputes", "number": "10", "kind": "other"}
+  ],
+  "expected_high_risk": [],
+  "required_kinds": [
+    "pricing", "payment", "delivery", "force-majeure", "termination", "liability"
+  ],
+  "expected_missing": ["Insurance", "Take or Pay", "Audit Rights", "Credit Support", "Change in Law"],
+  "expected_present": ["Force Majeure", "Confidentiality", "Liability"]
+}

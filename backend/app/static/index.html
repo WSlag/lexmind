@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LexMind AI · AI Contract Intelligence Platform</title>
+<style>
+  :root {
+    --paper: #f4f6f9;
+    --surface: #ffffff;
+    --ink: #17233b;
+    --ink-soft: #3d4c66;
+    --muted: #64748b;
+    --line: #dfe5ee;
+    --line-soft: #e9edf4;
+    --navy: #1e3a6e;
+    --navy-deep: #14294e;
+    --brass: #b98a2f;
+    --low: #2e7d57;
+    --low-bg: #eaf6f0;
+    --medium: #a9731f;
+    --medium-bg: #fbf3e3;
+    --high: #b3452e;
+    --high-bg: #fbeae6;
+    --critical: #8f1d1d;
+    --critical-bg: #f7dede;
+    --none: #8494ad;
+    --none-bg: #eef1f6;
+    --radius: 6px;
+    --shadow: 0 1px 2px rgba(23,35,59,.05), 0 8px 24px rgba(23,35,59,.06);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--navy); }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    background: var(--navy-deep);
+    color: #fff;
+    border-bottom: 3px solid var(--brass);
+  }
+  .topbar-inner {
+    max-width: 1100px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .seal {
+    width: 42px; height: 42px; flex: 0 0 42px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 25%, #3d5a96, var(--navy) 55%, var(--navy-deep));
+    border: 1px solid rgba(255,255,255,.35);
+    display: grid; place-items: center;
+    font-family: Georgia, "Times New Roman", serif; font-size: 21px; font-weight: 700;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.12);
+  }
+  .brand h1 {
+    margin: 0; font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px; font-weight: 700; letter-spacing: .02em;
+  }
+  .brand .tag {
+    font-size: 11.5px; color: rgba(255,255,255,.72);
+    letter-spacing: .03em; margin-top: 1px;
+  }
+  .actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  /* ---------- layout ---------- */
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 24px 64px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px 30px;
+    margin-bottom: 20px;
+  }
+
+  /* ---------- buttons ---------- */
+  button { font-family: inherit; }
+  .btn {
+    border-radius: var(--radius); border: 1px solid transparent;
+    padding: 9px 18px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .btn-primary {
+    background: var(--navy); color: #fff;
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--navy-deep); }
+  .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-ghost {
+    background: transparent; color: rgba(255,255,255,.85);
+    border-color: rgba(255,255,255,.35); font-weight: 500;
+  }
+  .btn-ghost:hover { color: #fff; border-color: #fff; }
+  .btn-light {
+    background: #fff; color: var(--navy); border-color: var(--line);
+  }
+  .btn-light:hover { border-color: var(--navy); }
+
+  /* ---------- upload ---------- */
+  .drop {
+    border: 1.5px dashed #b9c4d6; border-radius: var(--radius);
+    padding: 40px 24px; text-align: center; cursor: pointer;
+    background: #fafbfd; transition: border-color .2s, background .2s;
+  }
+  .drop:hover, .drop.drag { border-color: var(--navy); background: #f3f6fb; }
+  .drop .ico {
+    font-size: 34px; color: var(--navy); margin-bottom: 8px; line-height: 1;
+  }
+  .drop strong { font-size: 15.5px; color: var(--ink); font-weight: 600; }
+  .drop p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+  input[type=file] { display: none; }
+  .file-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+  .file-name { font-size: 14px; color: var(--ink-soft); }
+  .file-name .doc { font-weight: 600; color: var(--ink); }
+
+  /* ---------- progress ---------- */
+  .progress-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+  .spinner {
+    width: 15px; height: 15px; border: 2px solid var(--line);
+    border-top-color: var(--navy); border-radius: 50%;
+    animation: spin .8s linear infinite; display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .stages { display: flex; gap: 0; flex-wrap: wrap; margin-top: 18px; align-items: center; }
+  .stage {
+    font-size: 12.5px; padding: 6px 16px; color: var(--muted);
+    background: var(--none-bg); border: 1px solid var(--line-soft);
+    position: relative;
+  }
+  .stage:first-child { border-radius: 4px 0 0 4px; }
+  .stage:last-child { border-radius: 0 4px 4px 0; }
+  .stage + .stage { border-left: 0; }
+  .stage.done { background: var(--low-bg); color: var(--low); border-color: #cde6d8; }
+  .stage.active { background: var(--navy); color: #fff; border-color: var(--navy); font-weight: 600; }
+  .progress-note { color: var(--muted); font-size: 12.5px; margin-top: 12px; }
+
+  /* ---------- live progress feed ---------- */
+  .feed { margin-top: 20px; border: 1px solid var(--line-soft); border-radius: var(--radius); overflow: hidden; }
+  .feed-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; border-bottom: 1px solid var(--line-soft);
+    font-size: 13.5px; color: var(--ink-soft);
+  }
+  .feed-item:last-child { border-bottom: 0; }
+  .feed-item.done { color: var(--muted); }
+  .feed-item.done .dot { color: var(--low); border-color: var(--low); }
+  .feed-item.active { background: #f3f6fb; color: var(--ink); font-weight: 600; }
+  .feed-item.active .dot { border-color: var(--navy); }
+  .feed-item .dot {
+    width: 16px; height: 16px; flex: 0 0 16px; border-radius: 50%;
+    border: 1.5px solid var(--line); display: grid; place-items: center;
+    font-size: 10px; line-height: 1;
+  }
+  .feed-item .tick { display: none; }
+  .feed-item.done .tick { display: block; }
+  .feed-item .spin {
+    width: 9px; height: 9px; border: 1.5px solid var(--line);
+    border-top-color: var(--navy); border-radius: 50%;
+    animation: spin .8s linear infinite; display: none;
+  }
+  .feed-item.active .spin { display: block; }
+  .feed-item .d { margin-left: auto; color: var(--muted); font-size: 11.5px; flex-shrink: 0; }
+  .feed-item.active .d { color: var(--navy); }
+
+  /* ---------- report ---------- */
+  .report-head {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 14px; margin-bottom: 20px;
+  }
+  .report-kicker {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .14em;
+    color: var(--navy); font-weight: 700; margin-bottom: 6px;
+  }
+  .report-head h2 {
+    margin: 0; font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px; font-weight: 700; color: var(--ink); line-height: 1.25;
+  }
+  .report-sub {
+    display: flex; gap: 22px; flex-wrap: wrap; margin-top: 10px;
+    color: var(--muted); font-size: 12.5px;
+  }
+  .report-sub b { color: var(--ink-soft); font-weight: 600; }
+
+  .verdict {
+    display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+    background: #fafbfd; border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px 24px; margin: 20px 0;
+  }
+  .gauge {
+    width: 118px; height: 118px; border-radius: 50%; flex: 0 0 118px;
+    display: grid; place-items: center; text-align: center;
+    border: 8px solid var(--none); color: var(--none);
+  }
+  .gauge .g-val { font-family: Georgia, serif; font-size: 21px; font-weight: 700; line-height: 1; }
+  .gauge .g-lbl { font-size: 9.5px; text-transform: uppercase; letter-spacing: .12em; margin-top: 3px; }
+  .gauge.low { border-color: var(--low); color: var(--low); }
+  .gauge.medium { border-color: var(--medium); color: var(--medium); }
+  .gauge.high { border-color: var(--high); color: var(--high); }
+  .gauge.critical { border-color: var(--critical); color: var(--critical); }
+  .verdict-text { flex: 1 1 300px; min-width: 0; }
+  .verdict-text h3 { margin: 0 0 6px; font-size: 16px; color: var(--ink); }
+  .verdict-text p { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.6; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 18px 0 4px; }
+  .kpi {
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: #fafbfd; padding: 14px 16px;
+  }
+  .kpi .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-weight: 600; }
+  .kpi .v { font-size: 22px; font-weight: 700; margin-top: 3px; font-family: Georgia, serif; }
+  .kpi .v.neg { color: var(--high); }
+  .kpi .v.warn { color: var(--medium); }
+
+  .section { margin-top: 26px; }
+  .section-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12.5px; text-transform: uppercase; letter-spacing: .12em;
+    color: var(--navy); font-weight: 700; margin: 0 0 14px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--line);
+  }
+  .section-title .num {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--navy);
+    color: #fff; font-size: 11px; display: grid; place-items: center; font-weight: 700;
+  }
+
+  .issue {
+    display: flex; gap: 12px; padding: 11px 14px; margin-bottom: 8px;
+    border: 1px solid var(--line-soft); border-radius: var(--radius);
+    background: #fafbfd; align-items: flex-start;
+  }
+  .issue .mark { flex: 0 0 18px; text-align: center; color: var(--medium); font-size: 14px; line-height: 1.4; }
+  .issue p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+
+  table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.data th, table.data td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  table.data th {
+    color: var(--muted); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .06em; background: #fafbfd;
+    border-bottom: 1px solid var(--line);
+  }
+  table.data tr:last-child td { border-bottom: 0; }
+
+  .pill {
+    display: inline-block; padding: 3px 10px; border-radius: 4px;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .pill.low { background: var(--low-bg); color: var(--low); }
+  .pill.medium { background: var(--medium-bg); color: var(--medium); }
+  .pill.high { background: var(--high-bg); color: var(--high); }
+  .pill.critical { background: var(--critical); color: #fff; }
+  .pill.none { background: var(--none-bg); color: var(--none); }
+
+  .cat {
+    display: inline-block; background: #eef2f8; color: var(--ink-soft);
+    border: 1px solid var(--line-soft); border-radius: 3px;
+    padding: 2px 8px; margin: 2px 4px 2px 0; font-size: 11.5px;
+  }
+  .prio {
+    display: inline-block; border-radius: 3px; padding: 2px 8px; font-size: 11px;
+    font-weight: 700; letter-spacing: .03em; margin-left: 6px;
+  }
+  .prio.fix { background: var(--critical-bg); color: var(--critical); }
+  .prio.negotiate { background: var(--medium-bg); color: var(--medium); }
+  .prio.acceptable { background: var(--low-bg); color: var(--low); }
+  .prio.informational { background: var(--none-bg); color: var(--none); }
+
+  .ref-line { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+  /* accordion clauses */
+  .clause {
+    border: 1px solid var(--line); border-radius: var(--radius);
+    margin-bottom: 10px; background: #fff; overflow: hidden;
+  }
+  .clause summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 13px 16px; cursor: pointer; list-style: none;
+  }
+  .clause summary::-webkit-details-marker { display: none; }
+  .clause summary:hover { background: #f7f9fc; }
+  .clause summary .c-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .clause summary .c-title { font-weight: 600; font-size: 14px; color: var(--ink); }
+  .clause summary .c-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .chev { color: var(--muted); font-size: 12px; transition: transform .15s; }
+  .clause[open] .chev { transform: rotate(90deg); }
+  .clause .c-body { padding: 4px 18px 16px; border-top: 1px solid var(--line-soft); }
+  .field { margin-top: 13px; }
+  .field .flabel {
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--navy); font-weight: 700; margin-bottom: 4px;
+  }
+  .field p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.6; }
+
+  .conf-line {
+    margin-top: 13px; padding-top: 10px; border-top: 1px solid var(--line-soft);
+    font-size: 12.5px; color: var(--muted);
+  }
+
+  .wording {
+    background: #f6f8fb; border: 1px solid var(--line); border-radius: 4px;
+    padding: 12px 14px; font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 12.5px; color: var(--ink); white-space: pre-wrap; line-height: 1.55;
+    margin-top: 6px;
+  }
+  .copy-wrap { margin-top: 8px; }
+
+  .conflict {
+    border: 1px solid var(--line); border-left: 4px solid var(--medium);
+    border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; background: #fff;
+  }
+  .conflict h4 { margin: 0 0 6px; font-size: 14px; color: var(--ink); }
+  .conflict .link { color: var(--navy); font-weight: 600; }
+  .conflict p { margin: 5px 0; font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+  .conflict .fix { color: var(--ink); }
+  .conflict .fix b { color: var(--navy); }
+
+  .memo {
+    border: 1px solid var(--line); border-left: 4px solid var(--navy);
+    border-radius: var(--radius); padding: 20px 24px; line-height: 1.65;
+    font-size: 13.5px; color: var(--ink-soft); background: #fafbfd; white-space: pre-wrap;
+    font-family: Georgia, "Times New Roman", serif;
+  }
+
+  .foot {
+    color: var(--muted); font-size: 12px; margin-top: 24px;
+    border-top: 1px solid var(--line); padding-top: 14px;
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+
+  .err-box {
+    border: 1px solid var(--high); border-left: 4px solid var(--high);
+    background: var(--high-bg); color: var(--critical);
+    border-radius: var(--radius); padding: 14px 18px; font-size: 14px;
+  }
+
+  .disclaimer { font-size: 11.5px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
+  /* ---------- ask-contract chat ---------- */
+  .chat-thread { display: flex; flex-direction: column; gap: 14px; margin: 4px 0 18px; max-height: 480px; overflow-y: auto; }
+  .msg { max-width: 82%; padding: 12px 15px; border-radius: var(--radius); font-size: 13.5px; line-height: 1.55; }
+  .msg .who { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; font-weight: 700; margin-bottom: 4px; }
+  .msg.user { align-self: flex-end; background: var(--navy); color: #fff; border-radius: var(--radius) var(--radius) 2px var(--radius); }
+  .msg.user .who { color: rgba(255,255,255,.7); }
+  .msg.bot { align-self: flex-start; background: #fafbfd; border: 1px solid var(--line); border-radius: var(--radius) var(--radius) var(--radius) 2px; color: var(--ink-soft); }
+  .msg.bot .who { color: var(--navy); }
+  .msg.bot .flagged { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; background: var(--medium-bg); color: var(--medium); }
+  .chat-cites { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 9px; }
+  .chat-cites .ct { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  .cite {
+    display: block; background: #fff; border: 1px solid var(--line-soft); border-left: 3px solid var(--navy);
+    border-radius: 4px; padding: 8px 11px; margin-bottom: 6px; font-size: 12px; color: var(--ink-soft);
+  }
+  .cite .cn { font-weight: 700; color: var(--navy); }
+  .cite .cs { font-style: italic; color: var(--muted); display: block; margin-top: 2px; }
+  .chat-input { display: flex; gap: 10px; align-items: stretch; }
+  .chat-input input {
+    flex: 1; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 11px 14px; font-size: 13.5px; font-family: inherit; color: var(--ink);
+    outline: none; background: #fff;
+  }
+  .chat-input input:focus { border-color: var(--navy); }
+  .chat-hint { color: var(--muted); font-size: 11.5px; margin-top: 8px; }
+  .msg.typing { font-style: italic; color: var(--muted); }
+  .msg.typing .who::after { content: ""; animation: dots 1.2s steps(4, end) infinite; }
+  @keyframes dots {
+    0% { content: ""; }
+    25% { content: " ."; }
+    50% { content: " .."; }
+    75% { content: " ..."; }
+    100% { content: ""; }
+  }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 16px; }
+    .card { padding: 18px; }
+    .topbar-inner { padding: 12px 16px; }
+    .verdict { padding: 16px; }
+  }
+
+  @media print {
+    body { background: #fff; }
+    .topbar { background: #fff; color: #000; border-bottom: 2px solid #000; }
+    .brand h1 { color: #000; }
+    .brand .tag, .actions { display: none; }
+    .wrap { max-width: none; padding: 0; }
+    .card { box-shadow: none; border: 0; padding: 0; margin: 0; }
+    .drop, .stages, .progress-note { display: none; }
+    .clause[open] .c-body { display: block; }
+    .clause summary { cursor: default; }
+    .copy-wrap { display: none; }
+    a { text-decoration: none; color: inherit; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="seal">L</div>
+      <div>
+        <h1>LexMind AI</h1>
+        <div class="tag" id="appTag">AI Contract Intelligence Platform · Commercial Contract Review · Risk Analysis · Negotiation Support</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-ghost" id="newBtn" style="display:none" title="Start another review">New Review</button>
+      <button class="btn btn-ghost" id="printBtn" style="display:none" title="Print or save this report as PDF">Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="card" id="uploadCard">
+    <div class="drop" id="drop">
+      <div class="ico">§</div>
+      <div><strong>Upload a contract for review</strong></div>
+      <p>Drag &amp; drop, or click to browse · PDF · DOCX · TXT</p>
+    </div>
+    <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md,.csv" />
+    <div class="file-meta" id="fileMeta" style="display:none">
+      <div class="file-name" id="fileName"></div>
+      <button class="btn btn-primary" id="startBtn" disabled>Start Review</button>
+    </div>
+  </div>
+
+  <div class="card" id="progressCard" style="display:none">
+    <div class="progress-title">
+      <span class="spinner"></span>
+      <span id="progressTitle">Reviewing contract…</span>
+    </div>
+    <div class="stages" id="stages"></div>
+    <div class="feed" id="feed"></div>
+    <div class="progress-note" id="progressNote"></div>
+  </div>
+
+  <div class="card" id="errorCard" style="display:none">
+    <div class="err-box" id="errorMsg"></div>
+  </div>
+
+  <div id="results" style="display:none"></div>
+
+  <div class="card" id="chatCard" style="display:none">
+    <div class="section-title"><span class="num">8</span> Ask Your Contract</div>
+    <p style="margin:0 0 12px;color:var(--muted);font-size:13px">Ask a specific question about this agreement. Answers are grounded in the parsed clause text and cite verbatim excerpts.</p>
+    <div class="chat-thread" id="chatThread">
+      <div class="msg bot"><div class="who">LexMind</div>I've reviewed the contract. Ask me about any clause — payment terms, liability limits, indemnities, termination rights, or how two clauses interact.</div>
+    </div>
+    <form class="chat-input" id="chatForm">
+      <input id="chatInput" type="text" placeholder="e.g. What happens if the Owner delays payment?" autocomplete="off" />
+      <button class="btn btn-primary" id="chatSend" type="submit">Ask</button>
+    </form>
+    <div class="chat-hint">Cited answers are generated by AI for diligence and drafting assistance, not legal advice.</div>
+  </div>
+</div>
+
+<script>
+const STAGES = ["queued", "parsing", "extracting", "reviewing", "complete", "failed"];
+
+const drop = document.getElementById("drop");
+const fileInput = document.getElementById("fileInput");
+const startBtn = document.getElementById("startBtn");
+const fileName = document.getElementById("fileName");
+const fileMeta = document.getElementById("fileMeta");
+const uploadCard = document.getElementById("uploadCard");
+const progressCard = document.getElementById("progressCard");
+const errorCard = document.getElementById("errorCard");
+const errorMsg = document.getElementById("errorMsg");
+const results = document.getElementById("results");
+const newBtn = document.getElementById("newBtn");
+const printBtn = document.getElementById("printBtn");
+
+let selectedFile = null;
+let currentReviewId = null;
+let chatHistory = [];
+
+function setFile(f) {
+  selectedFile = f;
+  fileMeta.style.display = f ? "flex" : "none";
+  fileName.innerHTML = f
+    ? `Selected: <span class="doc">${esc(f.name)}</span> &nbsp;·&nbsp; ${(f.size/1024).toFixed(1)} KB`
+    : "";
+  startBtn.disabled = !f;
+}
+drop.addEventListener("click", () => fileInput.click());
+drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("drag"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("drag"));
+drop.addEventListener("drop", e => {
+  e.preventDefault(); drop.classList.remove("drag");
+  if (e.dataTransfer.files.length) setFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener("change", e => setFile(e.target.files[0]));
+
+newBtn.addEventListener("click", () => {
+  selectedFile = null;
+  fileInput.value = "";
+  uploadCard.style.display = "block";
+  progressCard.style.display = "none";
+  errorCard.style.display = "none";
+  results.style.display = "none";
+  document.getElementById("chatCard").style.display = "none";
+  currentReviewId = null;
+  chatHistory = [];
+  newBtn.style.display = "none";
+  printBtn.style.display = "none";
+  fileMeta.style.display = "none";
+  startBtn.disabled = true;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+printBtn.addEventListener("click", () => window.print());
+
+startBtn.addEventListener("click", async () => {
+  if (!selectedFile) return;
+  uploadCard.style.display = "none";
+  errorCard.style.display = "none";
+  results.style.display = "none";
+  newBtn.style.display = "none";
+  printBtn.style.display = "none";
+  progressCard.style.display = "block";
+  renderStages("queued");
+
+  const fd = new FormData();
+  fd.append("file", selectedFile);
+
+  let jobId;
+  try {
+    const res = await fetch("/api/v1/reviews", { method: "POST", body: fd });
+    if (!res.ok) throw new Error((await res.text()) || `HTTP ${res.status}`);
+    const body = await res.json();
+    jobId = body.review_id;
+    poll(jobId);
+  } catch (e) {
+    showError(e.message || "Failed to start review");
+  }
+});
+
+let pollTimer = null;
+function poll(jobId) {
+  clearTimeout(pollTimer);
+  fetch(`/api/v1/reviews/${jobId}`)
+    .then(r => r.json())
+    .then(job => {
+      renderStages(job.stage || job.status);
+      renderFeed(job.progress || []);
+      document.getElementById("progressNote").textContent = jobStatusText(job);
+      if (job.status === "complete" && job.result) {
+        clearTimeout(pollTimer);
+        progressCard.style.display = "none";
+        renderResults(job.result);
+      } else if (job.status === "failed") {
+        clearTimeout(pollTimer);
+        showError(job.error || "Review failed.");
+      } else {
+        pollTimer = setTimeout(() => poll(jobId), 1500);
+      }
+    })
+    .catch(() => { pollTimer = setTimeout(() => poll(jobId), 2000); });
+}
+
+const PIPELINE_STEPS = [
+  ["parse", "Parsing document"],
+  ["extract", "Extracting clauses"],
+  ["risk_review", "Reviewing clause risk"],
+  ["missing", "Checking missing protections"],
+  ["negotiation", "Building negotiation playbook"],
+  ["consistency", "Checking cross-clause consistency"],
+  ["summary", "Drafting executive summary"],
+];
+
+function renderFeed(progress) {
+  const box = document.getElementById("feed");
+  const done = new Set(progress.map(p => p.stage));
+  const lastStage = progress.length ? progress[progress.length - 1].stage : null;
+  let currentShown = false;
+  box.innerHTML = "";
+  PIPELINE_STEPS.forEach(([stage, label], i) => {
+    const item = document.createElement("div");
+    const entry = progress.find(p => p.stage === stage);
+    if (done.has(stage)) {
+      item.className = "feed-item done";
+      item.innerHTML = `<span class="dot"><span class="tick">✓</span><span class="spin"></span></span>
+        <span>${label}</span>${entry && entry.detail ? `<span class="d">${entry.detail}</span>` : ""}`;
+    } else if (!currentShown && !done.has(lastStage)) {
+      currentShown = true;
+      item.className = "feed-item active";
+      item.innerHTML = `<span class="dot"><span class="tick">✓</span><span class="spin"></span></span>
+        <span>${label}</span><span class="d">in progress</span>`;
+    } else {
+      item.className = "feed-item";
+      item.innerHTML = `<span class="dot"></span><span>${label}</span>`;
+    }
+    box.appendChild(item);
+  });
+}
+
+function jobStatusText(job) {
+  const labels = { queued: "Queued", parsing: "Parsing document…", running: "Reviewing clauses…", extracting: "Extracting clauses…", complete: "Done", failed: "Failed" };
+  return labels[job.status] || labels[job.stage] || job.status || "";
+}
+
+function renderStages(stage) {
+  const box = document.getElementById("stages");
+  box.innerHTML = "";
+  PIPELINE_STEPS.forEach(([name, label], i) => {
+    const el = document.createElement("span");
+    el.className = "stage";
+    const idxNow = PIPELINE_STEPS.findIndex(([n]) => n === stage);
+    if (stage === "complete" || stage === "failed") {
+      el.className = "stage done"; el.textContent = label;
+    } else if (i < idxNow) {
+      el.className = "stage done"; el.textContent = label;
+    } else if (i === idxNow || stage === "queued" || stage === "parsing") {
+      el.className = "stage active"; el.textContent = label + "…";
+    } else {
+      el.textContent = label;
+    }
+    box.appendChild(el);
+  });
+}
+
+function riskClass(r) { return (r || "none").toLowerCase(); }
+function riskText(r) { return (r || "none").toUpperCase(); }
+
+function renderResults(d) {
+  results.style.display = "block";
+  newBtn.style.display = "inline-block";
+  printBtn.style.display = "inline-block";
+  currentReviewId = d.review_id;
+  chatHistory = [];
+  const chatCard = document.getElementById("chatCard");
+  chatCard.style.display = "block";
+  document.getElementById("chatThread").innerHTML =
+    '<div class="msg bot"><div class="who">LexMind</div>I\'ve reviewed the contract. Ask me about any clause — payment terms, liability limits, indemnities, termination rights, or how two clauses interact.</div>';
+  document.getElementById("chatInput").value = "";
+  const doc = d.document || {};
+  if (doc.contract_type) {
+    document.getElementById("appTag").textContent =
+      "AI Contract Intelligence Platform · " + doc.contract_type;
+  }
+  const es = d.executive_summary || {};
+  const missing = d.missing_clauses || [];
+  const reviews = d.clause_reviews || [];
+  const negot = d.negotiation_points || [];
+  const conflicts = es.cross_clause_conflicts || d.cross_clause_conflicts || [];
+  const high = reviews.filter(r => ["high","critical"].includes(riskClass(r.risk_level))).length;
+  const medium = reviews.filter(r => riskClass(r.risk_level) === "medium").length;
+  const reviewedAt = new Date().toLocaleString("en-AU", { dateStyle: "medium", timeStyle: "short" });
+
+  let html = `<div class="card">`;
+
+  // ---- report header ----
+  html += `<div class="report-head">
+    <div class="report-kicker">Contract Review Report</div>
+    <h2>${esc(doc.contract_type || "Agreement")}</h2>
+    <div class="report-sub">
+      <span>Document: <b>${esc(doc.filename || "")}</b></span>
+      <span>Prepared: <b>${esc(reviewedAt)}</b></span>
+      <span>Review ref: <b>${esc(d.review_id)}</b></span>
+    </div>
+  </div>`;
+
+  // ---- verdict ----
+  html += `<div class="verdict">
+    <div class="gauge ${riskClass(es.overall_risk)}">
+      <div><div class="g-val">${riskText(es.overall_risk)}</div>
+      <div class="g-lbl">Overall Risk</div></div>
+    </div>
+    <div class="verdict-text">
+      <h3>Executive Recommendation</h3>
+      <p>${esc(es.recommendation || "")}</p>
+    </div>
+  </div>`;
+
+  // ---- kpis ----
+  html += `<div class="kpis">`;
+  html += `<div class="kpi"><div class="k">Review time saved</div><div class="v">${esc(es.estimated_time_saved_minutes || 0)} min</div></div>`;
+  html += `<div class="kpi"><div class="k">Clauses reviewed</div><div class="v">${reviews.length}</div></div>`;
+  html += `<div class="kpi"><div class="k">High risk</div><div class="v neg">${high}</div></div>`;
+  html += `<div class="kpi"><div class="k">Medium risk</div><div class="v warn">${medium}</div></div>`;
+  html += `<div class="kpi"><div class="k">Missing clauses</div><div class="v warn">${missing.length}</div></div>`;
+  html += `<div class="kpi"><div class="k">Cross-clause conflicts</div><div class="v">${conflicts.length}</div></div>`;
+  html += `</div>`;
+
+  // ---- key issues ----
+  if (es.key_issues && es.key_issues.length) {
+    html += `<div class="section"><div class="section-title"><span class="num">1</span> Key Issues</div>`;
+    es.key_issues.forEach(k => { html += `<div class="issue"><span class="mark">▪</span><p>${esc(k)}</p></div>`; });
+    html += `</div>`;
+  }
+
+  // ---- negotiation playbook ----
+  if (negot.length) {
+    html += `<div class="section"><div class="section-title"><span class="num">2</span> Negotiation Playbook</div>`;
+    html += `<table class="data"><tr><th style="width:22%">Issue</th><th>If you act for the Owner</th><th>If you act for the Contractor</th></tr>`;
+    negot.forEach(n => {
+      html += `<tr><td><strong>${esc(n.topic)}</strong></td>
+        <td>${esc(n.owner_position || n.strategy || "—")}</td>
+        <td>${esc(n.contractor_position || n.strategy || "—")}</td></tr>`;
+    });
+    html += `</table></div>`;
+  }
+
+  // ---- missing clauses ----
+  if (missing.length) {
+    html += `<div class="section"><div class="section-title"><span class="num">3</span> Missing Protections</div>`;
+    missing.forEach(m => {
+      html += `<div class="issue" style="align-items:flex-start">
+        <div style="flex:0 0 74px;padding-top:1px"><span class="pill ${riskClass(m.severity)}">${riskText(m.severity)}</span></div>
+        <div style="flex:1">
+          <strong style="font-size:13.5px">${esc(m.clause)}</strong> <span class="ref-line" style="display:inline">· ${esc(m.category)}</span>
+          ${m.rationale ? `<p style="margin:4px 0 0;font-size:13px;color:var(--ink-soft)">${esc(m.rationale)}</p>` : ""}
+          ${m.authorities && m.authorities.length ? `<div class="ref-line">Market reference: ${m.authorities.map(esc).join(" · ")}</div>` : ""}
+          ${m.benchmark ? `<div class="ref-line">${esc(m.benchmark)}</div>` : ""}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ---- cross-clause conflicts ----
+  if (conflicts.length) {
+    html += `<div class="section"><div class="section-title"><span class="num">4</span> Cross-Clause Conflicts</div>`;
+    conflicts.forEach(c => {
+      html += `<div class="conflict">
+        <h4><span class="link">${esc(c.clause_title_a)}</span> ⇄ <span class="link">${esc(c.clause_title_b)}</span>
+          <span class="pill ${riskClass(c.severity)}" style="margin-left:8px">${riskText(c.severity)}</span></h4>
+        <div>${(c.conflict_type ? `<span class="cat">${esc(c.conflict_type)}</span>` : "")}</div>
+        ${c.description ? `<p>${esc(c.description)}</p>` : ""}
+        ${c.recommendation ? `<p class="fix"><b>Recommended fix:</b> ${esc(c.recommendation)}</p>` : ""}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ---- all clauses ----
+  html += `<div class="section"><div class="section-title"><span class="num">5</span> Clause-by-Clause Review</div>`;
+  reviews.forEach(r => { html += clauseCard(r, negot); });
+  html += `</div>`;
+
+  // ---- suggested replacements ----
+  const withWording = negot.filter(n => n.suggested_wording);
+  if (withWording.length) {
+    html += `<div class="section"><div class="section-title"><span class="num">6</span> Suggested Clause Replacements</div>`;
+    withWording.forEach(n => {
+      html += `<div class="clause">
+        <div style="padding:14px 16px"><strong>${esc(n.topic)}</strong></div>
+        <div style="padding:4px 18px 16px;border-top:1px solid var(--line-soft)">
+          <div class="field"><div class="flabel">Proposed replacement wording</div>
+            <div class="wording" id="w-${esc(n.clause_uid)}">${esc(n.suggested_wording)}</div>
+            <div class="copy-wrap"><button class="btn btn-light" onclick="copyText('w-${esc(n.clause_uid)}')">Copy wording</button></div>
+          </div>`;
+      if (n.fallback_wording) {
+        html += `<div class="field"><div class="flabel">Fallback wording</div><div class="wording">${esc(n.fallback_wording)}</div></div>`;
+      }
+      if (n.strategy) html += `<div class="field"><div class="flabel">Strategy</div><p>${esc(n.strategy)}</p></div>`;
+      html += `</div></div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ---- review memo ----
+  if (es.memo) {
+    html += `<div class="section"><div class="section-title"><span class="num">7</span> Review Memorandum</div>`;
+    html += `<div class="memo">${esc(es.memo)}</div>`;
+  }
+
+  html += `<div class="foot">
+    <span>Prepared by LexMind AI · ${esc(d.review_id)}</span>
+    <span>${esc(doc.filename || "")}</span>
+  </div>
+  <div class="disclaimer">This review is generated by an AI model for diligence and drafting assistance. It is not legal advice and does not replace review by a qualified practitioner.</div>
+  `;
+
+  results.innerHTML = html;
+}
+
+function clauseCard(r, negot) {
+  const n = negot.find(x => x.clause_uid === r.clause_uid);
+  const cats = (r.risk_categories||[]).map(c => `<span class="cat">${esc(c)}</span>`).join("");
+  const confPct = Math.round((r.confidence||0)*100);
+  const prio = priorityBadge(r.action_priority);
+  const pill = `<span class="pill ${riskClass(r.risk_level)}">${riskText(r.risk_level)}</span>`;
+  let html = `<details class="clause">
+    <summary>
+      <span class="c-left">${pill}<span class="c-title">${esc(r.clause_title)}</span></span>
+      <span class="c-right">${prio}<span class="chev">▶</span></span>
+    </summary>
+    <div class="c-body">
+      <div style="margin-top:12px">${cats}</div>`;
+  if (r.business_impact) html += `<div class="field"><div class="flabel">Business impact</div><p>${esc(r.business_impact)}</p></div>`;
+  if (r.legal_impact) html += `<div class="field"><div class="flabel">Legal impact</div><p>${esc(r.legal_impact)}</p></div>`;
+  if (r.commercial_analysis) html += `<div class="field"><div class="flabel">Commercial analysis</div><p>${esc(r.commercial_analysis)}</p></div>`;
+  if (r.recommendation) html += `<div class="field"><div class="flabel">Recommended action</div><p>${esc(r.recommendation)}</p></div>`;
+  if (r.authorities && r.authorities.length) html += `<div class="field"><div class="flabel">Authority / market reference</div><p class="ref-line">${r.authorities.map(esc).join(" · ")}</p></div>`;
+  html += `<div class="conf-line">Confidence <strong>${confPct}%</strong>` +
+    (r.confidence_reason ? ` — ${esc(r.confidence_reason)}` : "") + `</div>`;
+  if (n && n.suggested_wording) {
+    html += `<div class="field"><div class="flabel">Suggested replacement</div>
+      <div class="wording" id="w-${esc(n.clause_uid)}">${esc(n.suggested_wording)}</div>
+      <div class="copy-wrap"><button class="btn btn-light" onclick="copyText('w-${esc(n.clause_uid)}')">Copy wording</button></div></div>`;
+  }
+  html += `</div></details>`;
+  return html;
+}
+
+function priorityBadge(p) {
+  const map = {
+    "fix-before-signing": ["fix", "Fix before signing"],
+    "negotiate-if-possible": ["negotiate", "Negotiate if possible"],
+    "acceptable": ["acceptable", "Acceptable"],
+    "informational": ["informational", "Informational"],
+  };
+  const [cls, label] = map[p] || map.informational;
+  return `<span class="prio ${cls}">${esc(label)}</span>`;
+}
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(el.textContent);
+  } else {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+    document.execCommand("copy"); sel.removeAllRanges();
+  }
+  const btn = el.nextElementSibling.querySelector("button") || el.nextElementSibling;
+  if (btn) { const t = btn.textContent; btn.textContent = "Copied"; setTimeout(()=>btn.textContent=t, 1500); }
+}
+
+function esc(s) {
+  const d = document.createElement("div");
+  d.textContent = (s == null ? "" : String(s));
+  return d.innerHTML;
+}
+
+document.getElementById("chatForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const input = document.getElementById("chatInput");
+  const q = input.value.trim();
+  if (!q || !currentReviewId) return;
+  input.value = "";
+  appendMsg("user", q);
+  const send = document.getElementById("chatSend");
+  send.disabled = true;
+  const typingEl = appendBotTyping();
+  try {
+    const res = await fetch(`/api/v1/reviews/${currentReviewId}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q, history: chatHistory }),
+    });
+    typingEl.remove();
+    if (!res.ok) {
+      let detail = `HTTP ${res.status}`;
+      try { const e = await res.json(); detail = e.detail || detail; } catch (_) {}
+      if (res.status === 404) {
+        appendBot("This review is no longer available on the server (it was likely cleared by a restart). Please start a new review, then ask again.", true, []);
+        chatHistory = [];
+        currentReviewId = null;
+        const nb = document.getElementById("newBtn");
+        if (nb) { nb.style.display = "inline-block"; nb.click(); }
+        return;
+      }
+      throw new Error(detail);
+    }
+    const data = await res.json();
+    chatHistory.push({ role: "user", content: q });
+    chatHistory.push({ role: "assistant", content: data.answer });
+    appendBot(data.answer, data.grounded !== false, data.citations || []);
+  } catch (err) {
+    typingEl.remove();
+    appendBot("Sorry — I couldn't answer that: " + (err.message || "request failed"), true, []);
+  } finally {
+    send.disabled = false;
+  }
+});
+
+function appendBotTyping() {
+  const box = document.getElementById("chatThread");
+  const el = document.createElement("div");
+  el.className = "msg bot typing";
+  el.innerHTML = '<div class="who">LexMind</div><div>Reviewing the clauses…</div>';
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+  return el;
+}
+
+function appendMsg(role, text) {
+  const box = document.getElementById("chatThread");
+  const el = document.createElement("div");
+  el.className = "msg " + role;
+  const who = role === "user" ? "You" : "LexMind";
+  el.innerHTML = `<div class="who">${esc(who)}</div><div>${esc(text)}</div>`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+
+function appendBot(answer, grounded, citations) {
+  const box = document.getElementById("chatThread");
+  const el = document.createElement("div");
+  el.className = "msg bot";
+  let html = `<div class="who">LexMind${grounded ? "" : '<span class="flagged">Not fully grounded</span>'}</div>`;
+  html += `<div>${esc(answer)}</div>`;
+  if (citations.length) {
+    html += `<div class="chat-cites"><div class="ct">Cited clauses</div>`;
+    citations.forEach(c => {
+      html += `<div class="cite"><span class="cn">${esc(c.clause_number || c.clause_title || "")}</span>` +
+        (c.clause_title && c.clause_title !== c.clause_number ? ` · ${esc(c.clause_title)}` : "") +
+        (c.snippet ? `<span class="cs">"${esc(c.snippet)}"</span>` : "") + `</div>`;
+    });
+    html += `</div>`;
+  }
+  el.innerHTML = html;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+
+function showError(msg) {
+  errorCard.style.display = "block";
+  progressCard.style.display = "none";
+  errorMsg.textContent = msg;
+}
+</script>
+</body>
+</html>

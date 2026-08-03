@@ -1,0 +1,59 @@
+GAS SUPPLY FRAMEWORK AGREEMENT
+
+This Gas Supply Agreement (the "Agreement") is made between Northwind
+Production Partners, LP ("Supplier") and Delta City Gas Authority ("Customer").
+
+1. BACKGROUND
+
+1.1 This Agreement sets out the framework under which Supplier will supply and
+Customer will purchase Natural Gas from time to time.
+
+2. SUPPLY
+
+2.1 Supplier shall make Natural Gas available for delivery on a best-efforts
+basis in accordance with nominations submitted by Customer.
+
+3. PRICING
+
+3.1 The price for Natural Gas shall be agreed between the parties at the time
+of each nomination, subject to market conditions.
+
+4. INVOICING AND PAYMENT
+
+4.1 Supplier shall invoice Customer for delivered volumes. Customer shall pay
+the invoiced amount within thirty (30) days of receipt.
+
+5. QUALITY
+
+5.1 Natural Gas shall meet the specifications attached as Schedule A.
+
+6. FORCE MAJEURE
+
+6.1 Neither party shall be liable for failure to perform required by an event
+outside its reasonable control, subject to prompt notice.
+
+7. TERM AND TERMINATION
+
+7.1 This Agreement shall continue until terminated by either party on sixty
+(60) days' written notice to the other.
+
+8. LIABILITY
+
+8.1 Each party shall be liable to the other for direct damages only.
+
+9. CONFIDENTIALITY
+
+9.1 The parties shall keep the terms of this Agreement confidential.
+
+10. GOVERNING LAW AND DISPUTES
+
+10.1 This Agreement shall be governed by the laws of Texas. Disputes shall be
+referred to arbitration.
+
+IN WITNESS WHEREOF the parties have executed this Agreement.
+
+SUPPLIER: Northwind Reserve, LP
+By: ____________________
+
+CUSTOMER: City Gas Authority, LLC
+By: ____________________

@@ -1,0 +1,10 @@
+# Local deployment cruft — keep the Fly build context small.
+backend/data
+backend/.env
+backend/.env.example
+backend/tests
+backend/**/__pycache__
+examples
+data
+*.log
+.git
