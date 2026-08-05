@@ -35,8 +35,9 @@ class OpenAICompatProvider(LLMProvider):
             api_key=self._api_key,
             base_url=self._base_url or None,
             temperature=0,
+            max_tokens=max_tokens,
         )
-        raw = chat.invoke(self._messages(system, user, max_tokens))
+        raw = chat.invoke(self._messages(system, user))
         content = self._extract_text(raw)
         result = parse_ir(content)
         if not isinstance(result, dict):
@@ -44,7 +45,7 @@ class OpenAICompatProvider(LLMProvider):
         return result
 
     @staticmethod
-    def _messages(system: str, user: str, max_tokens: int) -> list[dict[str, Any]]:
+    def _messages(system: str, user: str) -> list[dict[str, Any]]:
         return [
             {"role": "system", "content": system},
             {"role": "user", "content": user},

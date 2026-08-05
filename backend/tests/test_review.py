@@ -131,6 +131,32 @@ def test_negotiation_accepts_medium_risk() -> None:
     assert "clause_reviews" in status["result"]
 
 
+def test_result_review_id_matches_job_id_for_chat() -> None:
+    """The frontend chats against ``result.review_id``, so it must equal the
+    job id returned by POST /reviews or the chat endpoint 404s and the UI
+    resets to the upload screen."""
+    raw = client.post(
+        "/api/v1/reviews",
+        files={"file": (SAMPLE.name, SAMPLE.read_bytes(), "text/plain")},
+    )
+    job_id = raw.json()["review_id"]
+    import time
+
+    for _ in range(50):
+        time.sleep(0.1)
+        status = client.get(f"/api/v1/reviews/{job_id}").json()
+        if status["status"] in ("complete", "failed"):
+            break
+    assert status["status"] == "complete", status
+    assert status["result"]["review_id"] == job_id
+
+    resp = client.post(
+        f"/api/v1/reviews/{job_id}/chat",
+        json={"question": "What is the liability cap?", "history": []},
+    )
+    assert resp.status_code == 200, resp.text
+
+
 def test_ask_contract_returns_grounded_answer() -> None:
     raw = client.post(
         "/api/v1/reviews",

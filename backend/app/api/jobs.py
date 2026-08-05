@@ -97,7 +97,9 @@ def _run(review_id: str, filename: str, data: bytes) -> None:
 
     try:
         update("parsing", "running")
-        review = _service().run(filename, data, on_progress=on_progress)
+        review = _service().run(
+            filename, data, review_id=review_id, on_progress=on_progress
+        )
         with _LOCK:
             JOBS[review_id]["result"] = review
             JOBS[review_id]["stage"] = "complete"
