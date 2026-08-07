@@ -1,4 +1,4 @@
-# GasMind AI
+# Lexmind AI
 
 AI contract review for gas supply agreements.
 
