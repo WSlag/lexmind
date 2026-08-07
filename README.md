@@ -3,7 +3,7 @@
 AI legal contract review.
 
 This is the **MVP code scaffold**: a FastAPI + LangGraph pipeline that parses a
-gas supply agreement (PDF/DOCX/TXT), inventories its clauses, scores risk,
+legal agreement (PDF/DOCX/TXT), inventories its clauses, scores risk,
 detects missing clauses, and produces an evidence-backed executive summary with
 negotiation recommendations.
 
