@@ -1,6 +1,6 @@
 # Lexmind AI
 
-AI contract review for gas supply agreements.
+AI legal contract review.
 
 This is the **MVP code scaffold**: a FastAPI + LangGraph pipeline that parses a
 gas supply agreement (PDF/DOCX/TXT), inventories its clauses, scores risk,
